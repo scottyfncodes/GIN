@@ -1,10 +1,30 @@
 # THE LONG GAME (repo: GIN)
 
-Vite + vanilla JS app, deployed to GitHub Pages at https://scottyfncodes.github.io/GIN/
+A local-first PWA scorekeeper for Scott and Ellen's never-ending gin rummy game.
+React + TypeScript + Vite, deployed to GitHub Pages at https://scottyfncodes.github.io/GIN/
 
-- `npm test` — Vitest (jsdom) unit tests
-- `npm run build` — production build into `dist/` (Vite `base` is `/GIN/`)
+- `npm test` — Vitest (engine, storage, and jsdom UI tests)
+- `npm run build` — typecheck + production build into `dist/` (Vite `base` is `/GIN/`)
 - `npm run dev` — local dev server
+
+## Scoring rule (house rule, not standard gin)
+
+Each hand records both players' leftover (deadwood) totals. The player with
+**less** leftover receives the difference; the other gets 0; equal leftovers
+score nothing (Scott 13 / Ellen 0 → Ellen +13). No bonuses of any kind. This
+lives only in `scoreHand` in `src/engine/scoring.ts`.
+
+## Layout
+
+- `src/engine/` — pure, framework-free logic. `stats.ts` derives everything
+  (totals, leader, stretches, comebacks, streaks, records) in O(n) passes from
+  the raw hand list; `moments.ts` builds the timeline. Never store derived
+  values: recompute from hands.
+- `src/storage/` — `schema.ts` (versioned format, `migrate`, import validation)
+  and `store.ts` (localStorage persistence). Bump `SCHEMA_VERSION` and add a
+  migration step for any stored-shape change.
+- `src/ui/` — React screens and SVG charts. `public/sw.js` is the offline
+  service worker; `public/icons/` holds the app icon (source: `icon.svg`).
 
 ## Non-negotiable update workflow
 
